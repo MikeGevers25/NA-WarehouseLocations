@@ -25,9 +25,9 @@ def save_data(df):
 
 # Streamlit configuratie
 st.set_page_config(page_title="Kisten Voorraad App", layout="wide")
-st.title("💼 Kisten Voorraadbeheer - Anilox")
+st.title("💼 Warehouse locations - Crates")
 
-menu = st.sidebar.radio("Navigatie", ["Nieuwe Binnenkomst", "Zoeken & Beheer"])
+menu = st.sidebar.radio("Navigatie", ["New crates", "Search & Manage"])
 
 df = load_data()
 
