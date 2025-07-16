@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import os
 import datetime
-from utils.barcode_gen import generate_barcode
 
 # File paths
 DATA_PATH = 'data/inventory.csv'
@@ -37,7 +36,6 @@ if menu == "New Entry":
 
     if st.button("Register Crate"):
         if work_order and location:
-            barcode_bytes = generate_barcode(work_order)
             date = datetime.datetime.now().strftime("%Y-%m-%d")
             df = pd.concat([df, pd.DataFrame.from_records([{
                 "work_order": work_order,
@@ -47,7 +45,6 @@ if menu == "New Entry":
             }])])
             save_data(df)
             st.success(f"Crate {work_order} saved at location {location}!")
-            st.download_button("Download Barcode Label (.png)", barcode_bytes, file_name=f"{work_order}.png")
         else:
             st.warning("Please fill in both work order and location.")
 
