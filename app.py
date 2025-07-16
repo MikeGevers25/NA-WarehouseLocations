@@ -1,16 +1,17 @@
+# app.py
 import streamlit as st
 import pandas as pd
 import os
 import datetime
 from utils.barcode_gen import generate_barcode
 
-# Mappen en bestandsnamen
+# Bestandspaden
 DATA_PATH = 'data/voorraad.csv'
 BARCODE_DIR = 'barcodes'
 os.makedirs('data', exist_ok=True)
 os.makedirs(BARCODE_DIR, exist_ok=True)
 
-# Data laden of initialiseren
+# Laad of initialiseer data
 def load_data():
     if os.path.exists(DATA_PATH):
         return pd.read_csv(DATA_PATH)
@@ -19,15 +20,15 @@ def load_data():
         df.to_csv(DATA_PATH, index=False)
         return df
 
-# Data opslaan
+# Opslaan
 def save_data(df):
     df.to_csv(DATA_PATH, index=False)
 
-# Streamlit configuratie
+# UI
 st.set_page_config(page_title="Kisten Voorraad App", layout="wide")
-st.title("💼 Warehouse locations - Crates")
+st.title("💼 Kisten Voorraadbeheer - Anilox")
 
-menu = st.sidebar.radio("Navigatie", ["New crates", "Search & Manage"])
+menu = st.sidebar.radio("Navigatie", ["Nieuwe Binnenkomst", "Zoeken & Beheer"])
 
 df = load_data()
 
@@ -38,20 +39,18 @@ if menu == "Nieuwe Binnenkomst":
 
     if st.button("Registreer kist"):
         if werkorder and locatie:
-            if werkorder in df['werkorder'].values:
-                st.warning("Deze werkorder bestaat al!")
-            else:
-                barcode_path = generate_barcode(werkorder, BARCODE_DIR)
-                datum = datetime.datetime.now().strftime("%Y-%m-%d")
-                df = pd.concat([df, pd.DataFrame.from_records([{
-                    "werkorder": werkorder,
-                    "locatie": locatie,
-                    "status": "In magazijn",
-                    "datum": datum
-                }])])
-                save_data(df)
-                st.success(f"Kist {werkorder} opgeslagen op locatie {locatie}!")
-                st.download_button("Download barcode label", open(barcode_path, "rb"), file_name=f"{werkorder}.pdf")
+            barcode_path = generate_barcode(werkorder, BARCODE_DIR)
+            datum = datetime.datetime.now().strftime("%Y-%m-%d")
+            df = pd.concat([df, pd.DataFrame.from_records([{
+                "werkorder": werkorder,
+                "locatie": locatie,
+                "status": "In magazijn",
+                "datum": datum
+            }])])
+            save_data(df)
+            st.success(f"Kist {werkorder} opgeslagen op locatie {locatie}!")
+            with open(barcode_path, "rb") as f:
+                st.download_button("Download barcode label (.png)", f, file_name=f"{werkorder}.png")
         else:
             st.warning("Vul zowel werkorder als locatie in.")
 
