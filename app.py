@@ -7,9 +7,7 @@ from utils.barcode_gen import generate_barcode
 
 # File paths
 DATA_PATH = 'data/inventory.csv'
-BARCODE_DIR = 'barcodes'
 os.makedirs('data', exist_ok=True)
-os.makedirs(BARCODE_DIR, exist_ok=True)
 
 # Load or initialize data
 def load_data():
@@ -39,7 +37,7 @@ if menu == "New Entry":
 
     if st.button("Register Crate"):
         if work_order and location:
-            barcode_path = generate_barcode(work_order, BARCODE_DIR)
+            barcode_bytes = generate_barcode(work_order)
             date = datetime.datetime.now().strftime("%Y-%m-%d")
             df = pd.concat([df, pd.DataFrame.from_records([{
                 "work_order": work_order,
@@ -49,8 +47,7 @@ if menu == "New Entry":
             }])])
             save_data(df)
             st.success(f"Crate {work_order} saved at location {location}!")
-            with open(barcode_path, "rb") as f:
-                st.download_button("Download Barcode Label (.png)", f, file_name=f"{work_order}.png")
+            st.download_button("Download Barcode Label (.png)", barcode_bytes, file_name=f"{work_order}.png")
         else:
             st.warning("Please fill in both work order and location.")
 
