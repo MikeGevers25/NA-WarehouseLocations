@@ -5,11 +5,9 @@ import os
 import datetime
 from utils.barcode_gen import generate_barcode
 
-# Bestandspaden
+# Bestandspad
 DATA_PATH = 'data/voorraad.csv'
-BARCODE_DIR = 'barcodes'
 os.makedirs('data', exist_ok=True)
-os.makedirs(BARCODE_DIR, exist_ok=True)
 
 # Laad of initialiseer data
 def load_data():
@@ -39,7 +37,7 @@ if menu == "Nieuwe Binnenkomst":
 
     if st.button("Registreer kist"):
         if werkorder and locatie:
-            barcode_path = generate_barcode(werkorder, BARCODE_DIR)
+            barcode_buffer, barcode_filename = generate_barcode(werkorder)
             datum = datetime.datetime.now().strftime("%Y-%m-%d")
             df = pd.concat([df, pd.DataFrame.from_records([{
                 "werkorder": werkorder,
@@ -49,8 +47,7 @@ if menu == "Nieuwe Binnenkomst":
             }])])
             save_data(df)
             st.success(f"Kist {werkorder} opgeslagen op locatie {locatie}!")
-            with open(barcode_path, "rb") as f:
-                st.download_button("Download barcode label (.png)", f, file_name=f"{werkorder}.png")
+            st.download_button("Download barcode label (.png)", barcode_buffer, file_name=barcode_filename)
         else:
             st.warning("Vul zowel werkorder als locatie in.")
 
