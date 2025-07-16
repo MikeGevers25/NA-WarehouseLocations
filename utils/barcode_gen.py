@@ -4,17 +4,18 @@ from barcode.writer import ImageWriter
 import os
 
 def generate_barcode(werkorder, output_dir):
-    # Zorg dat de map bestaat
+    # Maak directory aan als die niet bestaat
     os.makedirs(output_dir, exist_ok=True)
 
-    # Maak een veilige bestandsnaam (geen / of andere rare tekens)
-    safe_name = werkorder.replace("/", "-")
+    # Veilige bestandsnaam zonder slashes
+    safe_name = werkorder.replace("/", "-").replace("\\", "-")
 
-    # Pad zonder extensie (wordt .png door barcode.save toegevoegd)
-    full_path_no_ext = os.path.join(output_dir, safe_name)
+    # Volledig pad MET extensie
+    filename = f"{safe_name}.png"
+    full_path = os.path.join(output_dir, filename)
 
-    # Barcode genereren (Code128) en opslaan als PNG
+    # Barcode aanmaken en opslaan als PNG
     code128 = barcode.get("code128", werkorder, writer=ImageWriter())
-    final_path = code128.save(full_path_no_ext)
+    code128.save(full_path[:-4])  # python-barcode voegt .png toe
 
-    return final_path  # bijv. 'barcodes/W25-012345.png'
+    return full_path  # bijv. 'barcodes/W25-012345.png'
