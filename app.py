@@ -45,4 +45,36 @@ if menu == "Nieuwe Binnenkomst":
                 datum = datetime.datetime.now().strftime("%Y-%m-%d")
                 df = pd.concat([df, pd.DataFrame.from_records([{
                     "werkorder": werkorder,
-                    "loca
+                    "locatie": locatie,
+                    "status": "In magazijn",
+                    "datum": datum
+                }])])
+                save_data(df)
+                st.success(f"Kist {werkorder} opgeslagen op locatie {locatie}!")
+                st.download_button("Download barcode label", open(barcode_path, "rb"), file_name=f"{werkorder}.pdf")
+        else:
+            st.warning("Vul zowel werkorder als locatie in.")
+
+elif menu == "Zoeken & Beheer":
+    st.header("Zoeken & Locatiebeheer")
+    zoekterm = st.text_input("Zoek op werkorder")
+
+    if zoekterm:
+        result = df[df["werkorder"].str.contains(zoekterm, case=False)]
+        st.dataframe(result)
+
+        if not result.empty:
+            selected_row = result.iloc[0]
+            new_loc = st.text_input("Nieuwe locatie", value=selected_row["locatie"])
+            if st.button("Update locatie"):
+                df.loc[df["werkorder"] == selected_row["werkorder"], "locatie"] = new_loc
+                save_data(df)
+                st.success("Locatie bijgewerkt")
+
+            if st.button("Markeer als verzonden"):
+                df.loc[df["werkorder"] == selected_row["werkorder"], "status"] = "Verzonden"
+                save_data(df)
+                st.success("Kist gemarkeerd als verzonden")
+
+    st.subheader("Voorraadoverzicht")
+    st.dataframe(df[df["status"] == "In magazijn"])
