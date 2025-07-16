@@ -1,19 +1,8 @@
-# app.py
 import streamlit as st
-import pandas as pd
-import os
-import datetime
-from utils.barcode_gen import generate_barcode
 
-# Bestandspaden
-DATA_PATH = 'data/voorraad.csv'
-BARCODE_DIR = 'barcodes'
-os.makedirs('data', exist_ok=True)
-os.makedirs(BARCODE_DIR, exist_ok=True)
+st.title("🎉 Test App voor Streamlit")
 
-# Laad of initialiseer data
-def load_data():
-    if os.path.exists(DATA_PATH):
-        return pd.read_csv(DATA_PATH)
-    else:
-        df = pd.DataFr
+st.write("Als je dit ziet, werkt je app!")
+
+if st.button("Klik mij!"):
+    st.success("Top! De app werkt helemaal goed.")
