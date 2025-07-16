@@ -5,16 +5,20 @@ import tempfile
 import os
 
 def generate_barcode(werkorder, output_dir):
-    # Strip ongeldige tekens uit bestandsnaam (zoals '/')
+    # Strip gevaarlijke tekens
     safe_name = werkorder.replace("/", "_")
 
-    # Zorg dat output_dir bestaat
+    # Zorg dat de directory bestaat
     os.makedirs(output_dir, exist_ok=True)
 
-    # Maak pad aan
-    filename = os.path.join(output_dir, f"{safe_name}")
-    
-    # Genereer en sla op als PNG
+    # Voeg altijd .png extensie toe
+    full_path = os.path.join(output_dir, f"{safe_name}.png")
+
+    # Barcode object aanmaken
     code128 = barcode.get("code128", werkorder, writer=ImageWriter())
-    filepath = code128.save(filename)  # voegt automatisch .png toe
-    return filepath  # dit is bijvoorbeeld barcodes/W25_012345.png
+
+    # barcode.save verwacht pad zonder extensie → daarom .save('pad/prefix') wordt 'prefix.png'
+    prefix = os.path.join(output_dir, safe_name)
+    code128.save(prefix)  # slaat op als 'prefix.png'
+
+    return full_path
